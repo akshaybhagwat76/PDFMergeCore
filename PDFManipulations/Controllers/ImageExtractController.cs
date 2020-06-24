@@ -23,7 +23,7 @@ namespace PDFManipulations.Controllers
     {
         
         static string rootFolder = Directory.GetCurrentDirectory();
-        public static string outPutFilePath = rootFolder + "\\wwwroot\\Merged PDFs\\Extracted" + ".pdf";
+        public static string outPutFilePath = rootFolder + "\\wwwroot\\MergedPDFs\\Extracted" + ".pdf";
         List<PdfReader> readerListpdf = new List<PdfReader>();
         byte[] password = Encoding.ASCII.GetBytes("123456");
 
@@ -55,7 +55,7 @@ namespace PDFManipulations.Controllers
 
                 ViewBag.ImageExtracted = "Image Extracted Succesfully in this path :- " + outPutFilePath;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
