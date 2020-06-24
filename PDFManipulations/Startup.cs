@@ -24,6 +24,8 @@ namespace PDFManipulations
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(); // Make sure you call this previous to AddMvc
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -38,6 +40,12 @@ namespace PDFManipulations
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            // Make sure you call this before calling app.UseMvc()
+            app.UseCors(
+                options => options.WithOrigins("https://mozilla.github.io", "https://localhost:44368").AllowAnyMethod()
+            );
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

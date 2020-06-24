@@ -21,8 +21,7 @@ namespace PDFManipulations.Controllers
     public class HomeController : Controller
     {
         
-         byte[] password = Encoding.ASCII.GetBytes("123456");
-        #region Upload Download file
+        byte[] password = Encoding.ASCII.GetBytes("123456");
         public IActionResult FileUpload()
         {
             return View();
@@ -56,10 +55,12 @@ namespace PDFManipulations.Controllers
                             var font = BaseFont.CreateFont(BaseFont.TIMES_BOLD, BaseFont.WINANSI, BaseFont.EMBEDDED);
                             byte[] watemarkedbytes =  AddWatermark(bytes, font);
 
-                             iTextSharp.text.pdf.PdfReader awatemarkreader = new iTextSharp.text.pdf.PdfReader(watemarkedbytes);
-                            //iTextSharp.text.pdf.PdfReader.unethicalreading = true;
-                            PdfEncryptor.Encrypt(awatemarkreader, outputData, true, "123456", "123456", PdfWriter.ALLOW_SCREENREADERS);
+                             iTextSharp.text.pdf.PdfReader awatemarkreader = new iTextSharp.text.pdf.PdfReader(watemarkedbytes,password);
+                            
+                            PdfEncryptor.Encrypt(awatemarkreader, outputData, true, "123456", "123456", PdfWriter.ALLOW_MODIFY_CONTENTS);
+                        
                             bytes = outputData.ToArray();
+
                             FileDetailsModel Fd = new Models.FileDetailsModel();
                             Fd.FileName = files.FileName;
                             Fd.FileContent = bytes;
@@ -88,8 +89,8 @@ namespace PDFManipulations.Controllers
         }
 
         [HttpGet]
-        public FileResult DownLoadFile(int id)
-        {
+        public ActionResult DownLoadFile(int id)
+            {
 
 
             List<FileDetailsModel> ObjFiles = GetFileList();
@@ -99,10 +100,13 @@ namespace PDFManipulations.Controllers
                             select new { FC.FileName, FC.FileContent }).ToList().FirstOrDefault();
 
 
-            return File(FileById.FileContent, "application/pdf", FileById.FileName);
+           // return File(FileById.FileContent, "application/pdf", FileById.FileName);
+            return File(FileById.FileContent, "application/pdf");
+
 
         }
-        #endregion
+
+        
             
         #region View Uploaded files
         [HttpGet]
@@ -114,6 +118,24 @@ namespace PDFManipulations.Controllers
            // return View();
 
         }
+
+        [HttpGet]
+        public ViewResult ViewPDF(int id)
+        {
+            List<FileDetailsModel> ObjFiles = GetFileList();
+
+            var FileById = (from FC in ObjFiles
+                            where FC.Id.Equals(id)
+                            select new { FC.Id, FC.FileName, FC.FileContent }).ToList().FirstOrDefault();
+
+            ViewData["ID"] = FileById.Id;
+            // return File(FileById.FileContent, "application/pdf", FileById.FileName);
+
+            return View();
+           // return View();
+
+        }
+
         private List<FileDetailsModel> GetFileList()
         {
             List<FileDetailsModel> DetList = new List<FileDetailsModel>();
@@ -150,19 +172,22 @@ namespace PDFManipulations.Controllers
         private void DbConnection()
         {
             //constr =ConfigurationManager.ConnectionStrings["dbcon"].ToString();
-            constr = @"Server = (localdb)\MSSQLLocalDB; Database = PDFFIles; Trusted_Connection = True";
+            constr = @"Server = den1.mssql7.gear.host; Database = webapp6; User Id = webapp6; Password = Oe3j6~?s9zvU;";
+           // constr = @"Server = den1.mssql7.gear.host; Database = webapp6; Trusted_Connection = True";
             con = new SqlConnection(constr);
 
         }
         #endregion
 
-        private byte[] AddWatermark(byte[] bytes, BaseFont bf)
+        public byte[] AddWatermark(byte[] bytes, BaseFont bf)
         {
             using (var ms = new MemoryStream(1000 * 1024))
             {
                 PdfReader reader = new PdfReader(bytes, password);
                 
                 PdfStamper stamper = new PdfStamper(reader, ms);
+                stamper.SetEncryption(password, password, PdfWriter.ALLOW_MODIFY_ANNOTATIONS, PdfWriter.STRENGTH40BITS);
+
                 PdfContentByte waterMark;
                 int times = reader.NumberOfPages;
 
@@ -175,6 +200,8 @@ namespace PDFManipulations.Controllers
                     waterMark.AddImage(img);
                 }
                 stamper.FormFlattening = true;
+               
+               
                 stamper.Close();
                 
                 return ms.ToArray();

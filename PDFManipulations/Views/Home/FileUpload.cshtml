@@ -4,6 +4,8 @@
     ViewBag.Title = "PDF Operations";
 }
 
+
+
 @using (Html.BeginForm("FileUpload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" } ))
 {
     @Html.AntiForgeryToken()
@@ -35,9 +37,17 @@
             </div>
             <div class="col-md-8">
                 @Html.ActionLink("Merge Files", "MergeFiles", "MergePDF", "MergePDFController")
-               
+
             </div>
-            <h> Put the files on "C:\PDF" to merge the PDFs </h>
+            <div class="col-md-8">
+                @Html.ActionLink("Extract Images", "ExtactImagesFromFile", "ImageExtract", "ExtactImagesFromFile")
+
+            </div>
+            @*<div class="col-md-8">
+                @Html.ActionLink("View PDF", "Home", "Home/ViewPDF")
+
+            </div>*@
         </div>
     </div>
+     
 }
