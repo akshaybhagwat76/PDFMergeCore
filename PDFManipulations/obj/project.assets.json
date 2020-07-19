@@ -12803,11 +12803,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\MyResearch\\PDFManipulations-master\\PDFManipulations-master\\PDFManipulations\\PDFManipulations.csproj",
+      "projectUniqueName": "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
       "projectName": "PDFManipulations",
-      "projectPath": "F:\\MyResearch\\PDFManipulations-master\\PDFManipulations-master\\PDFManipulations\\PDFManipulations.csproj",
+      "projectPath": "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
       "packagesPath": "C:\\Users\\balaji\\.nuget\\packages\\",
-      "outputPath": "F:\\MyResearch\\PDFManipulations-master\\PDFManipulations-master\\PDFManipulations\\obj\\",
+      "outputPath": "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

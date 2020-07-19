@@ -1,4 +1,15 @@
 ﻿@model IEnumerable<PDFManipulations.Models.FileDetailsModel>
+<br />
+<div class="row">
+    <input type="text" class="form-control" style="width: 800px;margin-left: 15px;" placeholder="Search..." id="textbox1">
+</div>
+<br />
+
+<div class="">
+
+    <ul id="out">
+    </ul>
+</div>
 
 
 <table class="table table-bordered">
@@ -6,22 +17,48 @@
         <th class="col-md-4">
             @Html.DisplayNameFor(model => model.FileName)
         </th>
-
-        <th class="col-md-2"></th>
     </tr>
-    @if ( Model != null ) {
-    @foreach (var item in Model)
+    @if (Model != null)
     {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FileName)
-            </td>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileName)
+                </td>
 
-            <td>
-                @Html.ActionLink("View File", "ViewPDF", new { id = item.Id })
-                @*@Html.ActionLink("Delete", "DeleteFile", new { id = item.id})*@
-            </td>
-        </tr>
-    }
+                @*<td>
+                        @Html.ActionLink("View File", "ViewPDF", new { id = item.Id })
+                    </td>*@
+            </tr>
+        }
     }
 </table>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+
+<script>
+    $("#textbox1").keyup(function () {
+        var textinput = $('#textbox1').val();
+        if (textinput != null && textinput.length > 3) {
+            $.get('../Home/readDataFromFileAndDB?searchText=' + textinput, function (data) {
+                $("#out").empty();
+                if (data != null && data.length > 0) {
+                    $.each(data, function (key, item) {
+                        let pdfPath = '/Home/HighlightPDF?path=' + item.searchPath + "&desc=" + item.searchDescription;
+                        debugger
+                        $("<li> <a id='pdfClick' onclick='highlightPDF(this)' style='cursor: pointer;' data-search=" + item.searchDescription + " data-id='" + item.searchPath + "'>" + item.searchDescription + "</a></li>").appendTo("ul#out");
+                    })
+                }
+            });
+        }
+    });
+
+    function highlightPDF($this) {
+        var search = $this.attributes[3].value;
+        debugger
+        var path = $this.getAttribute("data-id");
+
+        window.location.href = "/Home/HighlightPDF?path=" + path + "&desc=" + search;
+    }
+</script>

@@ -1,6 +1,4 @@
 ﻿@model PDFManipulations.Models.FileDetailsModel
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,40 +12,19 @@
     <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
     <script src=""></script>
     <script src="~/lib/jquery/jquery.min.js"></script>
-  
+
     <title>PDF Viewer</title>
 </head>
 <body>
-
-    @*   <iframe src="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://localhost:44368/Home/DownLoadFile/7" width="800px" height="500px" />*@
-
-   
-
     <iframe id="myframe" title="webviewer" width="800" height="500"> </iframe>
-
-  
-
-   
     <script>
-
-     
-
-             var str1 = "https://localhost:44368/Home/DownLoadFile/";
+        var str1 = "https://localhost:44368/Home/DownLoadFile/";
         var str2 = @ViewData["ID"] ;
         var url = str1.concat(str2);
         var pdfjs = "https://mozilla.github.io/pdf.js/web/viewer.html?file";
-      
         console.log(pdfjs)
-      
-     
         $('#myframe').attr('src', pdfjs);
-
-
-
-
-
     </script>
-
 </body>
 </html>
 

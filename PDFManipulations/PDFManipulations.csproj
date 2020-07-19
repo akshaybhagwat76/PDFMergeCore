@@ -14,8 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Merged PDFs\" />
+    <Folder Include="wwwroot\MergedPDFs\" />
     <Folder Include="wwwroot\ExtractedImages\" />
+    <Folder Include="wwwroot\Files\" />
   </ItemGroup>
 
 </Project>

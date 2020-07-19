@@ -21,5 +21,7 @@ namespace PDFManipulations.Models
         [Display(Name = "Uploaded File")]
         public String FileName { get; set; }
         public byte[] FileContent { get; set; }
+        public byte[] FileContentWithoutPWD { get; set; }
+        public String FileTextContent { get; set; }
     }
 }
