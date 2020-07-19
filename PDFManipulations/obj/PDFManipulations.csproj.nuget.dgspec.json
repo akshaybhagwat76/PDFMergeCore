@@ -1,24 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj": {}
+    "F:\\SaifSir\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj": {}
   },
   "projects": {
-    "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj": {
+    "F:\\SaifSir\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
+        "projectUniqueName": "F:\\SaifSir\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
         "projectName": "PDFManipulations",
-        "projectPath": "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
-        "packagesPath": "C:\\Users\\balaji\\.nuget\\packages\\",
-        "outputPath": "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\obj\\",
+        "projectPath": "F:\\SaifSir\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
+        "packagesPath": "C:\\Users\\bcss\\.nuget\\packages\\",
+        "outputPath": "F:\\SaifSir\\PDFMergeCore\\PDFManipulations\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
+          "C:\\Microsoft\\Xamarin\\NuGet\\",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\balaji\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\bcss\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp2.1"
@@ -41,6 +43,10 @@
       "frameworks": {
         "netcoreapp2.1": {
           "dependencies": {
+            "Aspose.PDF": {
+              "target": "Package",
+              "version": "[20.7.0, )"
+            },
             "Dapper": {
               "target": "Package",
               "version": "[2.0.35, )"
@@ -85,7 +91,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
         }
       }
     }
