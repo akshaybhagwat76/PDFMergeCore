@@ -24,6 +24,8 @@
         {
             <tr>
                 <td>
+                    @{var imagName = item.FileName.Replace(".pdf", ".jpg", StringComparison.CurrentCultureIgnoreCase); }
+                    <img src="/Files/Thumbnail/@Url.Content(imagName)" width="100" />
                     @Html.DisplayFor(modelItem => item.FileName)
                 </td>
 
@@ -46,7 +48,6 @@
                 if (data != null && data.length > 0) {
                     $.each(data, function (key, item) {
                         let pdfPath = '/Home/HighlightPDF?path=' + item.searchPath + "&desc=" + item.searchDescription;
-                        debugger
                         $("<li> <a id='pdfClick' onclick='highlightPDF(this)' style='cursor: pointer;' data-search=" + item.searchDescription + " data-id='" + item.searchPath + "'>" + item.searchDescription + "</a></li>").appendTo("ul#out");
                     })
                 }

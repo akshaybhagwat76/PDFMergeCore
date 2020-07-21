@@ -16,7 +16,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.files, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextBoxFor(model => model.files, "", new { @type = "file", @multiple = "multiple" })
+                @Html.TextBoxFor(model => model.files, "", new { @type = "file", @multiple = "multiple", accept = "application/pdf" })
                 @Html.ValidationMessageFor(model => model.files, "", new { @class = "text-danger" })
             </div>
         </div>
