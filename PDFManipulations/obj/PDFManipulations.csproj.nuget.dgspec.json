@@ -1,26 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "F:\\SaifSir\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj": {}
+    "D:\\06 Nikunj\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj": {}
   },
   "projects": {
-    "F:\\SaifSir\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj": {
+    "D:\\06 Nikunj\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\SaifSir\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
+        "projectUniqueName": "D:\\06 Nikunj\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
         "projectName": "PDFManipulations",
-        "projectPath": "F:\\SaifSir\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
-        "packagesPath": "C:\\Users\\bcss\\.nuget\\packages\\",
-        "outputPath": "F:\\SaifSir\\PDFMergeCore\\PDFManipulations\\obj\\",
+        "projectPath": "D:\\06 Nikunj\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
+        "packagesPath": "C:\\Users\\KEY-05\\.nuget\\packages\\",
+        "outputPath": "D:\\06 Nikunj\\PDFMergeCore\\PDFManipulations\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Microsoft\\Xamarin\\NuGet\\",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\bcss\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\KEY-05\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp2.1"
@@ -91,7 +89,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.300\\RuntimeIdentifierGraph.json"
         }
       }
     }
