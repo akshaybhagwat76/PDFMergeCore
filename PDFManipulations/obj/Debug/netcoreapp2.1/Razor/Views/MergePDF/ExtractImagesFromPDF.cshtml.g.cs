@@ -64,7 +64,7 @@ using PDFManipulations.Models;
             WriteLiteral("\r\n<h2>ExtractImagesFromPDF</h2>\r\n\r\n");
             EndContext();
             BeginContext(93, 447, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("body", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "ccc30234bfbf4d2c83703d3c9deb0725", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("body", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "368dd5e956d641ef84056e80540687f1", async() => {
                 BeginContext(99, 13, true);
                 WriteLiteral("\r\n    <div>\r\n");
                 EndContext();
@@ -72,7 +72,7 @@ using PDFManipulations.Models;
                 WriteLiteral("\r\n        ");
                 EndContext();
                 BeginContext(362, 48, false);
-                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("script", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "d8fbc0c44acf4488b242892e0b9abb32", async() => {
+                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("script", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "e7f48740ffb64fd7aab2e7860dc4adf2", async() => {
                 }
                 );
                 __Microsoft_AspNetCore_Mvc_Razor_TagHelpers_UrlResolutionTagHelper = CreateTagHelper<global::Microsoft.AspNetCore.Mvc.Razor.TagHelpers.UrlResolutionTagHelper>();

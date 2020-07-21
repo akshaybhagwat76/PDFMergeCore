@@ -14,7 +14,9 @@ using Microsoft.AspNetCore.Hosting;
 using iTextSharp.text.pdf.parser;
 using Aspose.Pdf.Devices;
 using AposeDocument = Aspose.Pdf;
-using iTextSharp.text;
+using SpirePdf = Spire.Pdf;
+using Spire.Pdf.General.Find;
+using System.Drawing;
 
 namespace PDFManipulations.Controllers
 {
@@ -280,65 +282,76 @@ namespace PDFManipulations.Controllers
             {
                 var testFile = path;
 
-                PdfReader reader = new PdfReader(testFile);
+                //PdfReader reader = new PdfReader(testFile);
 
-                var numberOfPages = reader.NumberOfPages;
-                System.Globalization.CompareOptions cmp = System.Globalization.CompareOptions.None;
-                //Create an instance of our strategy
+                //var numberOfPages = reader.NumberOfPages;
+                //System.Globalization.CompareOptions cmp = System.Globalization.CompareOptions.None;
+                ////Create an instance of our strategy
 
-                //MemoryStream m = new MemoryStream();
+                ////MemoryStream m = new MemoryStream();
 
-                //using (var fs = new FileStream(highLightFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                ////using (var fs = new FileStream(highLightFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                ////{
+                //using (MemoryStream m = new MemoryStream())
                 //{
-                using (MemoryStream m = new MemoryStream())
+                //    //PdfWriter.GetInstance(document, m);
+
+                //    using (PdfStamper stamper = new PdfStamper(reader, m))
+                //    {
+                //        //document.Open();
+                //        for (var currentPageIndex = 1; currentPageIndex <= numberOfPages; currentPageIndex++)
+                //        {
+
+                //            MyLocationTextExtractionStrategy strategyTest = new MyLocationTextExtractionStrategy(desc);
+                //            ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+
+                //            //Parse page 1 of the document above
+                //            using (var r = new PdfReader(testFile))
+                //            {
+                //                var ex = PdfTextExtractor.GetTextFromPage(r, currentPageIndex, strategyTest);
+                //            }
+
+                //            //Loop through each chunk found
+
+                //            foreach (var p in strategyTest.myPoints)
+                //            {
+
+                //                //Console.WriteLine(string.Format("Found text {0} at {1}x{2}", p.Text, p.Rect.Left, p.Rect.Bottom));
+                //                float[] quad = { p.Rect.Left, p.Rect.Bottom, p.Rect.Right, p.Rect.Bottom, p.Rect.Left, p.Rect.Top, p.Rect.Right, p.Rect.Top };
+
+                //                Rectangle rect = new Rectangle(p.Rect.Left,
+                //                                               p.Rect.Top,
+                //                                               p.Rect.Bottom,
+                //                                               p.Rect.Right);
+
+                //                PdfAnnotation highlight = PdfAnnotation.CreateMarkup(stamper.Writer, rect, null, PdfAnnotation.MARKUP_HIGHLIGHT, quad);
+
+                //                //Set the color
+                //                highlight.Color = BaseColor.YELLOW;
+
+                //                //Add the annotation
+                //                stamper.AddAnnotation(highlight, currentPageIndex);
+                //            }
+                //        }
+                //        stamper.Close();
+                //    }
+
+                //    //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+                //    byte[] result = m.ToArray();
+                //    m.Close();
+                SpirePdf.PdfDocument doc = new SpirePdf.PdfDocument(testFile);
+                for (var i = 0; i < doc.Pages.Count; i++)
                 {
-                    //PdfWriter.GetInstance(document, m);
-
-                    using (PdfStamper stamper = new PdfStamper(reader, m))
+                    PdfTextFind[] findResults = doc.Pages[i].FindText(desc, TextFindParameter.IgnoreCase).Finds;
+                    foreach (var result in findResults)
                     {
-                        //document.Open();
-                        for (var currentPageIndex = 1; currentPageIndex <= numberOfPages; currentPageIndex++)
-                        {
-
-                            MyLocationTextExtractionStrategy strategyTest = new MyLocationTextExtractionStrategy(desc);
-                            ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-
-                            //Parse page 1 of the document above
-                            using (var r = new PdfReader(testFile))
-                            {
-                                var ex = PdfTextExtractor.GetTextFromPage(r, currentPageIndex, strategyTest);
-                            }
-
-                            //Loop through each chunk found
-
-                            foreach (var p in strategyTest.myPoints)
-                            {
-
-                                //Console.WriteLine(string.Format("Found text {0} at {1}x{2}", p.Text, p.Rect.Left, p.Rect.Bottom));
-                                float[] quad = { p.Rect.Left, p.Rect.Bottom, p.Rect.Right, p.Rect.Bottom, p.Rect.Left, p.Rect.Top, p.Rect.Right, p.Rect.Top };
-
-                                Rectangle rect = new Rectangle(p.Rect.Left,
-                                                               p.Rect.Top,
-                                                               p.Rect.Bottom,
-                                                               p.Rect.Right);
-
-                                PdfAnnotation highlight = PdfAnnotation.CreateMarkup(stamper.Writer, rect, null, PdfAnnotation.MARKUP_HIGHLIGHT, quad);
-
-                                //Set the color
-                                highlight.Color = BaseColor.YELLOW;
-
-                                //Add the annotation
-                                stamper.AddAnnotation(highlight, currentPageIndex);
-                            }
-                        }
-                        stamper.Close();
+                        result.ApplyHighLight();
                     }
-
-                    //System.IO.MemoryStream ms = new System.IO.MemoryStream();
-                    byte[] result = m.ToArray();
-                    m.Close();
-                    return File(result, "application/pdf");
                 }
+                MemoryStream m = new MemoryStream();
+                doc.SaveToStream(m);
+                return File(m.ToArray(), "application/pdf");
+                //}
                 //}
 
             }

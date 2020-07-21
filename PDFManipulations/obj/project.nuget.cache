@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "qj28zAliLOGW7u3cet7JUetu1l0RwCJMoLyvxBRNMh3hiwaRZgwWPqHzd7Hauq91jagb/AU4p5l6l/sjuuPfZw==",
+  "dgSpecHash": "1BCiF0GyVHVMP9MDpXARTIS3BgUYM1SNPxOsP7iZehyaV7JMd2KTNT95j83RNA77uO5yjau7up+ZvDKiljYlpA==",
   "success": true,
   "projectFilePath": "D:\\06 Nikunj\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
   "expectedPackageFiles": [
@@ -208,6 +208,7 @@
     "C:\\Users\\KEY-05\\.nuget\\packages\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "C:\\Users\\KEY-05\\.nuget\\packages\\runtime.win-x64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "C:\\Users\\KEY-05\\.nuget\\packages\\runtime.win-x86.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x86.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
+    "C:\\Users\\KEY-05\\.nuget\\packages\\spire.pdf\\6.7.8\\spire.pdf.6.7.8.nupkg.sha512",
     "C:\\Users\\KEY-05\\.nuget\\packages\\system.appcontext\\4.3.0\\system.appcontext.4.3.0.nupkg.sha512",
     "C:\\Users\\KEY-05\\.nuget\\packages\\system.buffers\\4.5.0\\system.buffers.4.5.0.nupkg.sha512",
     "C:\\Users\\KEY-05\\.nuget\\packages\\system.collections\\4.3.0\\system.collections.4.3.0.nupkg.sha512",

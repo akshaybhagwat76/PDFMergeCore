@@ -3069,6 +3069,21 @@
           }
         }
       },
+      "Spire.PDF/6.7.8": {
+        "type": "package",
+        "dependencies": {
+          "System.Drawing.Common": "4.5.0",
+          "System.Text.Encoding.CodePages": "4.5.0"
+        },
+        "compile": {
+          "lib/netcoreapp2.0/Spire.License.dll": {},
+          "lib/netcoreapp2.0/Spire.Pdf.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.0/Spire.License.dll": {},
+          "lib/netcoreapp2.0/Spire.Pdf.dll": {}
+        }
+      },
       "System.AppContext/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -8222,6 +8237,46 @@
         "version.txt"
       ]
     },
+    "Spire.PDF/6.7.8": {
+      "sha512": "GBtbbT6Li+4gNgKf8ne3Y36dWulCrRLGPP2w0rE/RZc3rL7P954eo5rrWyx7+XluetRrAcA630yOx3kIzwJLCA==",
+      "type": "package",
+      "path": "spire.pdf/6.7.8",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/MonoAndroid/Spire.License.dll",
+        "lib/MonoAndroid/Spire.License.xml",
+        "lib/MonoAndroid/Spire.Pdf.dll",
+        "lib/MonoAndroid/Spire.Pdf.xml",
+        "lib/net20/Spire.License.dll",
+        "lib/net20/Spire.License.xml",
+        "lib/net20/Spire.Pdf.XML",
+        "lib/net20/Spire.Pdf.dll",
+        "lib/net40/Spire.License.dll",
+        "lib/net40/Spire.License.xml",
+        "lib/net40/Spire.Pdf.XML",
+        "lib/net40/Spire.Pdf.dll",
+        "lib/netcoreapp2.0/Spire.License.dll",
+        "lib/netcoreapp2.0/Spire.License.xml",
+        "lib/netcoreapp2.0/Spire.Pdf.dll",
+        "lib/netcoreapp2.0/Spire.Pdf.xml",
+        "lib/netcoreapp3.0/Spire.License.dll",
+        "lib/netcoreapp3.0/Spire.License.xml",
+        "lib/netcoreapp3.0/Spire.Pdf.dll",
+        "lib/netcoreapp3.0/Spire.Pdf.xml",
+        "lib/netstandard2.0/Spire.License.dll",
+        "lib/netstandard2.0/Spire.License.xml",
+        "lib/netstandard2.0/Spire.Pdf.dll",
+        "lib/netstandard2.0/Spire.Pdf.xml",
+        "lib/xamarinios/Spire.License.dll",
+        "lib/xamarinios/Spire.License.xml",
+        "lib/xamarinios/Spire.Pdf.dll",
+        "lib/xamarinios/Spire.Pdf.xml",
+        "license.txt",
+        "spire.pdf.6.7.8.nupkg.sha512",
+        "spire.pdf.nuspec"
+      ]
+    },
     "System.AppContext/4.3.0": {
       "sha512": "fKC+rmaLfeIzUhagxY17Q9siv/sPrjjKcfNg1Ic8IlQkZLipo8ljcaZQu4VtI4Jqbzjc2VTjzGLF6WmsRXAEgA==",
       "type": "package",
@@ -12989,6 +13044,7 @@
       "Microsoft.AspNetCore.Razor.Design >= 2.1.2",
       "Microsoft.NETCore.App >= 2.1.0",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 2.1.1",
+      "Spire.PDF >= 6.7.8",
       "System.Drawing.Common >= 5.0.0-preview.5.20278.1",
       "iTextSharp >= 5.5.13.1"
     ]
@@ -13062,6 +13118,10 @@
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
             "target": "Package",
             "version": "[2.1.1, )"
+          },
+          "Spire.PDF": {
+            "target": "Package",
+            "version": "[6.7.8, )"
           },
           "System.Drawing.Common": {
             "target": "Package",

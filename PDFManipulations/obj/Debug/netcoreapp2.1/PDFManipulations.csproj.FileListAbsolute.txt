@@ -193,7 +193,6 @@ D:\06 Nikunj\PDFMergeCore\PDFManipulations\bin\Debug\netcoreapp2.1\PDFManipulati
 D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.csprojAssemblyReference.cache
 D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.AssemblyInfoInputs.cache
 D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.AssemblyInfo.cs
-D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.csproj.CoreCompileInputs.cache
 D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.RazorAssemblyInfo.cache
 D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.RazorAssemblyInfo.cs
 D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.TagHelpers.input.cache
@@ -225,3 +224,4 @@ D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulati
 D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.pdb
 D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.genruntimeconfig.cache
 D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.csproj.CopyComplete
+D:\06 Nikunj\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.1\PDFManipulations.csproj.CoreCompileInputs.cache

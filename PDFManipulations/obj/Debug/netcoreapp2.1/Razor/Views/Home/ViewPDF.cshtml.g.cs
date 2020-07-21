@@ -56,7 +56,7 @@ using PDFManipulations.Models;
             WriteLiteral("<!DOCTYPE html>\r\n<html lang=\"en\">\r\n");
             EndContext();
             BeginContext(84, 613, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("head", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "6f260e4b32d64169b540bb9ebccf5676", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("head", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "7bf5c444c11c4848a096860d907b9c46", async() => {
                 BeginContext(90, 515, true);
                 WriteLiteral(@"
     <meta charset=""UTF-8"" />
@@ -71,7 +71,7 @@ using PDFManipulations.Models;
     ");
                 EndContext();
                 BeginContext(605, 50, false);
-                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("script", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "caae20353f43485590885446f4c417e3", async() => {
+                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("script", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "9c1b6c889809450d91025e11d63f6d82", async() => {
                 }
                 );
                 __Microsoft_AspNetCore_Mvc_Razor_TagHelpers_UrlResolutionTagHelper = CreateTagHelper<global::Microsoft.AspNetCore.Mvc.Razor.TagHelpers.UrlResolutionTagHelper>();
@@ -104,7 +104,7 @@ using PDFManipulations.Models;
             WriteLiteral("\r\n");
             EndContext();
             BeginContext(699, 415, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("body", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "87906a82ad994b5b838a64c59d4c43b2", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("body", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "1b7a72abd40a4ce7a0fb5692d6b58f7c", async() => {
                 BeginContext(705, 181, true);
                 WriteLiteral("\r\n    <iframe id=\"myframe\" title=\"webviewer\" width=\"800\" height=\"500\"> </iframe>\r\n    <script>\r\n        var str1 = \"https://localhost:44368/Home/DownLoadFile/\";\r\n        var str2 = ");
                 EndContext();

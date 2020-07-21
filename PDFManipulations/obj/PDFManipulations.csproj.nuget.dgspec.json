@@ -70,6 +70,10 @@
               "target": "Package",
               "version": "[2.1.1, )"
             },
+            "Spire.PDF": {
+              "target": "Package",
+              "version": "[6.7.8, )"
+            },
             "System.Drawing.Common": {
               "target": "Package",
               "version": "[5.0.0-preview.5.20278.1, )"
