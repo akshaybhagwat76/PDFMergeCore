@@ -353,7 +353,7 @@ namespace PDFManipulations.Controllers
         private string constr;
         private void DbConnection()
         {
-            constr = @"Server=DESKTOP-K1MBC9I;Database=pdfmanage;Trusted_Connection=True;";
+            constr = @"Server=DESKTOP-JI7C9MS;Database=ExcelData;User Id=sa;Password=sa123;";
             con = new SqlConnection(constr);
         }
         #endregion
