@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PDFManipulations.Models;
 using iTextSharp.text.pdf;
+using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using Dapper;
 using System.Data.SqlClient;
 using System.Data;
+using static System.Net.Mime.MediaTypeNames;
+using iTextSharp.text;
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
+using Newtonsoft.Json;
 using iTextSharp.text.pdf.parser;
-using Aspose.Pdf.Devices;
-using AposeDocument = Aspose.Pdf;
-using iTextSharp.text;
+using System.Security.Cryptography;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 namespace PDFManipulations.Controllers
 {
@@ -59,36 +65,7 @@ namespace PDFManipulations.Controllers
                     using (var FileStremUploaded = new FileStream(filePath, FileMode.Create))
                     {
                         files.CopyTo(FileStremUploaded);
-                        FileStremUploaded.Close();
                     }
-                    // Iterate through all the files entries in array
-                    //for (int counter = 0; counter < files.Length; counter++)
-                    //{
-                    //Open document
-
-                    AposeDocument.Document pdfDocument = new AposeDocument.Document(filePath);
-                    //for (int pageCount = 1; pageCount <= pdfDocument.Pages.Count; pageCount++)
-                    //{
-                    string thumbnailPath = System.IO.Path.Combine(uploads, "Thumbnail");
-                    if (!System.IO.Directory.Exists(thumbnailPath))
-                    {
-                        System.IO.Directory.CreateDirectory(thumbnailPath);
-                    }
-                    string imagePath = System.IO.Path.Combine(thumbnailPath, files.FileName.Replace(".pdf", ".jpg", StringComparison.CurrentCultureIgnoreCase));
-                    using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
-                    {
-                        //Create Resolution object
-                        Resolution resolution = new Resolution(500);
-                        JpegDevice jpegDevice = new JpegDevice(500, 700, resolution, 100);
-                        //JpegDevice jpegDevice = new JpegDevice(100, 150, resolution, 100);
-                        //Convert a particular page and save the image to stream
-                        //Convert a particular page and save the image to stream
-                        jpegDevice.Process(pdfDocument.Pages[1], imageStream);
-                        //Close stream
-                        imageStream.Close();
-                    }
-                    //}
-                    //}
                 }
 
                 Stream fileStream = files.OpenReadStream();
@@ -105,43 +82,37 @@ namespace PDFManipulations.Controllers
                     {
 
                         //ReaderProperties rp = new ReaderProperties();
-                        try
+
+                        iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes, password);
+                        var font = BaseFont.CreateFont(BaseFont.TIMES_BOLD, BaseFont.WINANSI, BaseFont.EMBEDDED);
+                        byte[] watemarkedbytes = AddWatermark(bytes, font);
+
+                        int PageNum = reader.NumberOfPages;
+                        string[] words;
+                        string line = string.Empty;
+
+                        for (int i = 1; i <= PageNum; i++)
                         {
-                            iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes, password);
-                            var font = BaseFont.CreateFont(BaseFont.TIMES_BOLD, BaseFont.WINANSI, BaseFont.EMBEDDED);
-                            byte[] watemarkedbytes = AddWatermark(bytes, font);
+                            string text = PdfTextExtractor.GetTextFromPage(reader, i, new LocationTextExtractionStrategy());
 
-                            int PageNum = reader.NumberOfPages;
-                            string[] words;
-                            string line = string.Empty;
-
-                            for (int i = 1; i <= PageNum; i++)
+                            words = text.Split('\n');
+                            for (int j = 0, len = words.Length; j < len; j++)
                             {
-                                string text = PdfTextExtractor.GetTextFromPage(reader, i, new LocationTextExtractionStrategy());
-
-                                words = text.Split('\n');
-                                for (int j = 0, len = words.Length; j < len; j++)
-                                {
-                                    line += Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(words[j]));
-                                }
+                                line += Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(words[j]));
                             }
-
-                            iTextSharp.text.pdf.PdfReader awatemarkreader = new iTextSharp.text.pdf.PdfReader(watemarkedbytes, password);
-                            FileDetailsModel Fd = new Models.FileDetailsModel();
-                            Fd.FileContentWithoutPWD = outputData.ToArray();
-                            PdfEncryptor.Encrypt(awatemarkreader, outputData, true, "123456", "123456", PdfWriter.ALLOW_MODIFY_CONTENTS);
-
-                            bytes = outputData.ToArray();
-
-                            Fd.FileName = files.FileName;
-                            Fd.FileContent = bytes;
-                            Fd.FileTextContent = line;
-                            SaveFileDetails(Fd);
                         }
-                        catch (Exception e)
-                        {
 
-                        }
+                        iTextSharp.text.pdf.PdfReader awatemarkreader = new iTextSharp.text.pdf.PdfReader(watemarkedbytes, password);
+                        FileDetailsModel Fd = new Models.FileDetailsModel();
+                        Fd.FileContentWithoutPWD = outputData.ToArray();
+                        PdfEncryptor.Encrypt(awatemarkreader, outputData, true, "123456", "123456", PdfWriter.ALLOW_MODIFY_CONTENTS);
+
+                        bytes = outputData.ToArray();
+
+                        Fd.FileName = files.FileName;
+                        Fd.FileContent = bytes;
+                        Fd.FileTextContent = line;
+                        SaveFileDetails(Fd);
                         return File(bytes, "application/pdf");
                     }
                 }
@@ -195,6 +166,7 @@ namespace PDFManipulations.Controllers
 
         private List<FileDetailsModel> GetFileList()
         {
+            //return new List<FileDetailsModel>();
             DbConnection();
             con.Open();
             List<FileDetailsModel> DetList = SqlMapper.Query<FileDetailsModel>(con, "GetFileDetails", commandType: CommandType.StoredProcedure).ToList();
@@ -211,7 +183,8 @@ namespace PDFManipulations.Controllers
         /// <returns>return data</returns>
         [HttpGet]
         public IActionResult readDataFromFileAndDB(string searchText)
-        {
+        {          
+
             var result = new List<string>();
 
             var uploads = System.IO.Path.Combine(_environment.WebRootPath);
@@ -236,7 +209,8 @@ namespace PDFManipulations.Controllers
                                 listData.Add(new SearchData
                                 {
                                     SearchDescription = searchText.ToLower(),
-                                    SearchPath = imageFile
+                                    SearchPath = imageFile,
+                                    FileName =ext
                                 });
                             }
                         }
@@ -250,20 +224,15 @@ namespace PDFManipulations.Controllers
 
         #region Database related operations
         private void SaveFileDetails(FileDetailsModel objDet)
-        {
-
+        {            
             DynamicParameters Parm = new DynamicParameters();
             Parm.Add("@FileName", objDet.FileName);
             Parm.Add("@FileContent", objDet.FileContent);
-            Parm.Add("@FileTextContent", objDet.FileTextContent);
-            //Parm.Add("@FileContentWithoutPWD", objDet.FileContentWithoutPWD);
 
             DbConnection();
             con.Open();
             con.Execute("AddFileDetails", Parm, commandType: System.Data.CommandType.StoredProcedure);
             con.Close();
-
-
         }
         #endregion
 
@@ -280,80 +249,54 @@ namespace PDFManipulations.Controllers
             {
                 var testFile = path;
 
-                PdfReader reader = new PdfReader(testFile);
-
-                var numberOfPages = reader.NumberOfPages;
-                System.Globalization.CompareOptions cmp = System.Globalization.CompareOptions.None;
-                //Create an instance of our strategy
-
-                //MemoryStream m = new MemoryStream();
-
-                //using (var fs = new FileStream(highLightFile, FileMode.Create, FileAccess.Write, FileShare.None))
-                //{
-                using (MemoryStream m = new MemoryStream())
-                {
-                    //PdfWriter.GetInstance(document, m);
-
-                    using (PdfStamper stamper = new PdfStamper(reader, m))
-                    {
-                        //document.Open();
-                        for (var currentPageIndex = 1; currentPageIndex <= numberOfPages; currentPageIndex++)
-                        {
-
-                            MyLocationTextExtractionStrategy strategyTest = new MyLocationTextExtractionStrategy(desc);
-                            ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-
-                            //Parse page 1 of the document above
-                            using (var r = new PdfReader(testFile))
-                            {
-                                var ex = PdfTextExtractor.GetTextFromPage(r, currentPageIndex, strategyTest);
-                            }
-
-                            //Loop through each chunk found
-
-                            foreach (var p in strategyTest.myPoints)
-                            {
-
-                                //Console.WriteLine(string.Format("Found text {0} at {1}x{2}", p.Text, p.Rect.Left, p.Rect.Bottom));
-                                float[] quad = { p.Rect.Left, p.Rect.Bottom, p.Rect.Right, p.Rect.Bottom, p.Rect.Left, p.Rect.Top, p.Rect.Right, p.Rect.Top };
-
-                                Rectangle rect = new Rectangle(p.Rect.Left,
-                                                               p.Rect.Top,
-                                                               p.Rect.Bottom,
-                                                               p.Rect.Right);
-
-                                PdfAnnotation highlight = PdfAnnotation.CreateMarkup(stamper.Writer, rect, null, PdfAnnotation.MARKUP_HIGHLIGHT, quad);
-
-                                //Set the color
-                                highlight.Color = BaseColor.YELLOW;
-
-                                //Add the annotation
-                                stamper.AddAnnotation(highlight, currentPageIndex);
-                            }
-                        }
-                        stamper.Close();
-                    }
-
-                    //System.IO.MemoryStream ms = new System.IO.MemoryStream();
-                    byte[] result = m.ToArray();
-                    m.Close();
-                    return File(result, "application/pdf");
-                }
-                //}
-
+                byte[] result = SearcText(path, desc).ToArray();
+                return File(result, "application/pdf");
             }
-
             return View("FileUpload");
-            //return File(FileById.FileContent, "application/pdf");
         }
+        /// <summary>
+        /// Written by Fredio
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="phrase"></param>
+        /// <returns></returns>
+        public System.IO.MemoryStream SearcText(string path,string phrase)
+        {
+            string LData = "PExpY2Vuc2U+CjxEYXRhPgo8TGljZW5zZWRUbz5BdmVQb2ludDwvTGljZW5zZWRUbz4KPEVtYWlsVG8+aXRfYmlsbGluZ0BhdmVwb2ludC5jb208L0VtYWlsVG8+CjxMaWNlbnNlVHlwZT5EZXZlbG9wZXIgT0VNPC9MaWNlbnNlVHlwZT4KPExpY2Vuc2VOb3RlPkxpbWl0ZWQgdG8gMSBkZXZlbG9wZXIsIHVubGltaXRlZCBwaHlzaWNhbCBsb2NhdGlvbnM8L0xpY2Vuc2VOb3RlPgo8T3JkZXJJRD4xOTA1MjAwNzE1NDY8L09yZGVySUQ+CjxVc2VySUQ+MTU0ODI2PC9Vc2VySUQ+CjxPRU0+VGhpcyBpcyBhIHJlZGlzdHJpYnV0YWJsZSBsaWNlbnNlPC9PRU0+CjxQcm9kdWN0cz4KPFByb2R1Y3Q+QXNwb3NlLlRvdGFsIGZvciAuTkVUPC9Qcm9kdWN0Pgo8L1Byb2R1Y3RzPgo8RWRpdGlvblR5cGU+RW50ZXJwcmlzZTwvRWRpdGlvblR5cGU+CjxTZXJpYWxOdW1iZXI+Y2JmMzVkNWYtOWE2Ni00ZTI4LTg1ZGQtM2ExN2JiZTM0MTNhPC9TZXJpYWxOdW1iZXI+CjxTdWJzY3JpcHRpb25FeHBpcnk+MjAyMDA2MDQ8L1N1YnNjcmlwdGlvbkV4cGlyeT4KPExpY2Vuc2VWZXJzaW9uPjMuMDwvTGljZW5zZVZlcnNpb24+CjxMaWNlbnNlSW5zdHJ1Y3Rpb25zPmh0dHBzOi8vcHVyY2hhc2UuYXNwb3NlLmNvbS9wb2xpY2llcy91c2UtbGljZW5zZTwvTGljZW5zZUluc3RydWN0aW9ucz4KPC9EYXRhPgo8U2lnbmF0dXJlPnpqZDMrdWgzNTdiZHhqR3JWTTZCN3I2c250TkRBTlRXU2MyQi9RWS9hdmZxTnA0VHk5Z0kxR2V1NUdOaWVwRHArY1JrRFBMdjBDRTZ2MHNjYVZwK1JNTkF5SzdiUzdzeGZSL205Z0NtekFNUlptdUxQTm1laEtZVTNvOGJWVDJvWmRJeEY2dVRTMDhIclJxUnk5SWt6c3BxYmRrcEZFY0lGcHlLbDF2NlF2UT08L1NpZ25hdHVyZT4KPC9MaWNlbnNlPg==";
 
+            Stream stream = new MemoryStream(Convert.FromBase64String(LData));
+            stream.Seek(0, SeekOrigin.Begin);
+            new Aspose.Pdf.License().SetLicense(stream);
+
+            Aspose.Pdf.Document document = new Aspose.Pdf.Document(path);
+            TextFragmentAbsorber textFragmentAbsorber = new TextFragmentAbsorber(phrase);
+            TextSearchOptions textSearchOptions = new TextSearchOptions(true);
+            textFragmentAbsorber.TextSearchOptions = textSearchOptions;
+            document.Pages.Accept(textFragmentAbsorber);
+            TextFragmentCollection textFragmentCollection1 = textFragmentAbsorber.TextFragments;
+            if (textFragmentCollection1.Count > 0)
+            {
+                foreach (TextFragment textFragment in textFragmentCollection1)
+                {
+                    Aspose.Pdf.Annotations.HighlightAnnotation freeText = new Aspose.Pdf.Annotations.HighlightAnnotation(textFragment.Page, new Aspose.Pdf.Rectangle(textFragment.Position.XIndent, textFragment.Position.YIndent, textFragment.Position.XIndent + textFragment.Rectangle.Width, textFragment.Position.YIndent + textFragment.Rectangle.Height));
+                    freeText.Opacity = 0.5;
+                    //freeText.Color = Aspose.Pdf.Color.FromRgb(0.6, 0.8, 0.98);
+                    freeText.Color = Aspose.Pdf.Color.Yellow;
+                    textFragment.Page.Annotations.Add(freeText);
+                }
+            }
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            document.Save(ms);
+            return ms;
+        }
+       
         #region Database connection
 
         private SqlConnection con;
         private string constr;
         private void DbConnection()
         {
-            constr = @"Server=DESKTOP-K1MBC9I;Database=pdfmanage;Trusted_Connection=True;";
+            constr = @"Server=Bhagwat;Database=ExcelData;User Id=sa;Password=sa123;";
             con = new SqlConnection(constr);
         }
         #endregion
