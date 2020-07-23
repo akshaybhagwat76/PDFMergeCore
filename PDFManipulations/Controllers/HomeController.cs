@@ -112,7 +112,6 @@ namespace PDFManipulations.Controllers
                         Fd.FileName = files.FileName;
                         Fd.FileContent = bytes;
                         Fd.FileTextContent = line;
-                        SaveFileDetails(Fd);
                         return File(bytes, "application/pdf");
                     }
                 }
@@ -126,56 +125,34 @@ namespace PDFManipulations.Controllers
 
         }
 
-        [HttpGet]
-        public ActionResult DownLoadFile(int id)
-        {
-            List<FileDetailsModel> ObjFiles = GetFileList();
-
-            var FileById = (from FC in ObjFiles
-                            where FC.Id.Equals(id)
-                            select new { FC.FileName, FC.FileContent }).ToList().FirstOrDefault();
-            return File(FileById.FileContent, "application/pdf");
-        }
-
-
 
         #region View Uploaded files
         [HttpGet]
         public ViewResult FileDetails()
         {
-            List<FileDetailsModel> DetList = GetFileList();
+            var uploads = System.IO.Path.Combine(_environment.WebRootPath);
+            List<FileDetailsModel> DetList = new List<FileDetailsModel>();
+            if (Directory.Exists(uploads))
+            {
+                string supportedExtensions = "*.pdf";
+                foreach (string file in Directory.GetFiles(uploads, supportedExtensions, SearchOption.AllDirectories).Where(s => supportedExtensions.Contains(System.IO.Path.GetExtension(s).ToLower())))
+                {
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        if (!file.ToLower().Contains("merged pdfs"))
+                        {
+
+                            FileDetailsModel obj = new FileDetailsModel();
+                            obj.FileName = System.IO.Path.GetFileName(file);
+                            DetList.Add(obj);
+                        }
+                    }
+                }
+            }
+
             return View("FileDetails", DetList);
         }
-
-        [HttpGet]
-        public ViewResult ViewPDF(int id)
-        {
-            List<FileDetailsModel> ObjFiles = GetFileList();
-
-            var FileById = (from FC in ObjFiles
-                            where FC.Id.Equals(id)
-                            select new { FC.Id, FC.FileName, FC.FileContent }).ToList().FirstOrDefault();
-
-            ViewData["ID"] = FileById.Id;
-            // return File(FileById.FileContent, "application/pdf", FileById.FileName);
-
-            return View();
-            // return View();
-
-        }
-
-        private List<FileDetailsModel> GetFileList()
-        {
-            //return new List<FileDetailsModel>();
-            DbConnection();
-            con.Open();
-            List<FileDetailsModel> DetList = SqlMapper.Query<FileDetailsModel>(con, "GetFileDetails", commandType: CommandType.StoredProcedure).ToList();
-            con.Close();
-            return DetList;
-        }
-
         #endregion
-
         /// <summary>
         /// read data from file and db
         /// </summary>
@@ -183,35 +160,35 @@ namespace PDFManipulations.Controllers
         /// <returns>return data</returns>
         [HttpGet]
         public IActionResult readDataFromFileAndDB(string searchText)
-        {          
+        {
 
             var result = new List<string>();
 
             var uploads = System.IO.Path.Combine(_environment.WebRootPath);
             List<SearchData> listData = new List<SearchData>();
-            var listOfFiles = GetFileList();
             if (searchText != null)
             {
                 if (Directory.Exists(uploads))
                 {
                     string supportedExtensions = "*.pdf";
-                    foreach (string imageFile in Directory.GetFiles(uploads, "*.*", SearchOption.AllDirectories).Where(s => supportedExtensions.Contains(System.IO.Path.GetExtension(s).ToLower())))
+                    foreach (string imageFile in Directory.GetFiles(uploads, supportedExtensions, SearchOption.AllDirectories).Where(s => supportedExtensions.Contains(System.IO.Path.GetExtension(s).ToLower())))
                     {
                         string ext = System.IO.Path.GetFileName(imageFile);
 
-                        bool bResult = listOfFiles.Any(cus => cus.FileName == ext);
-                        var fileFromDB = listOfFiles.Where(x => x.FileName == ext).FirstOrDefault();
-                        if (bResult && fileFromDB != null && !string.IsNullOrEmpty(fileFromDB.FileTextContent))
+                        if (!string.IsNullOrEmpty(ext))
                         {
-
-                            if (fileFromDB.FileTextContent.ToLower().Contains(searchText.ToLower()))
+                            if (!imageFile.ToLower().Contains("merged pdfs"))
                             {
-                                listData.Add(new SearchData
+
+                                if (ReadPdfFile(imageFile, searchText))
                                 {
-                                    SearchDescription = searchText.ToLower(),
-                                    SearchPath = imageFile,
-                                    FileName =ext
-                                });
+                                    listData.Add(new SearchData
+                                    {
+                                        SearchDescription = searchText,
+                                        SearchPath = imageFile,
+                                        FileName = ext
+                                    });
+                                }
                             }
                         }
                     }
@@ -221,20 +198,25 @@ namespace PDFManipulations.Controllers
             return Ok(listData);
         }
 
+        public Boolean ReadPdfFile(string fileName, String searthText)
+        {
+            if (System.IO.File.Exists(fileName))
+            {
+                PdfReader pdfReader = new PdfReader(fileName);
+                for (int page = 1; page <= pdfReader.NumberOfPages; page++)
+                {
+                    ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
 
-        #region Database related operations
-        private void SaveFileDetails(FileDetailsModel objDet)
-        {            
-            DynamicParameters Parm = new DynamicParameters();
-            Parm.Add("@FileName", objDet.FileName);
-            Parm.Add("@FileContent", objDet.FileContent);
-
-            DbConnection();
-            con.Open();
-            con.Execute("AddFileDetails", Parm, commandType: System.Data.CommandType.StoredProcedure);
-            con.Close();
+                    string currentPageText = PdfTextExtractor.GetTextFromPage(pdfReader, page, strategy);
+                    if (currentPageText.Contains(searthText))
+                    {
+                        pdfReader.Close();
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
-        #endregion
 
         /// <summary>
         /// HighlightPDF
@@ -260,7 +242,7 @@ namespace PDFManipulations.Controllers
         /// <param name="path"></param>
         /// <param name="phrase"></param>
         /// <returns></returns>
-        public System.IO.MemoryStream SearcText(string path,string phrase)
+        public System.IO.MemoryStream SearcText(string path, string phrase)
         {
             string LData = "PExpY2Vuc2U+CjxEYXRhPgo8TGljZW5zZWRUbz5BdmVQb2ludDwvTGljZW5zZWRUbz4KPEVtYWlsVG8+aXRfYmlsbGluZ0BhdmVwb2ludC5jb208L0VtYWlsVG8+CjxMaWNlbnNlVHlwZT5EZXZlbG9wZXIgT0VNPC9MaWNlbnNlVHlwZT4KPExpY2Vuc2VOb3RlPkxpbWl0ZWQgdG8gMSBkZXZlbG9wZXIsIHVubGltaXRlZCBwaHlzaWNhbCBsb2NhdGlvbnM8L0xpY2Vuc2VOb3RlPgo8T3JkZXJJRD4xOTA1MjAwNzE1NDY8L09yZGVySUQ+CjxVc2VySUQ+MTU0ODI2PC9Vc2VySUQ+CjxPRU0+VGhpcyBpcyBhIHJlZGlzdHJpYnV0YWJsZSBsaWNlbnNlPC9PRU0+CjxQcm9kdWN0cz4KPFByb2R1Y3Q+QXNwb3NlLlRvdGFsIGZvciAuTkVUPC9Qcm9kdWN0Pgo8L1Byb2R1Y3RzPgo8RWRpdGlvblR5cGU+RW50ZXJwcmlzZTwvRWRpdGlvblR5cGU+CjxTZXJpYWxOdW1iZXI+Y2JmMzVkNWYtOWE2Ni00ZTI4LTg1ZGQtM2ExN2JiZTM0MTNhPC9TZXJpYWxOdW1iZXI+CjxTdWJzY3JpcHRpb25FeHBpcnk+MjAyMDA2MDQ8L1N1YnNjcmlwdGlvbkV4cGlyeT4KPExpY2Vuc2VWZXJzaW9uPjMuMDwvTGljZW5zZVZlcnNpb24+CjxMaWNlbnNlSW5zdHJ1Y3Rpb25zPmh0dHBzOi8vcHVyY2hhc2UuYXNwb3NlLmNvbS9wb2xpY2llcy91c2UtbGljZW5zZTwvTGljZW5zZUluc3RydWN0aW9ucz4KPC9EYXRhPgo8U2lnbmF0dXJlPnpqZDMrdWgzNTdiZHhqR3JWTTZCN3I2c250TkRBTlRXU2MyQi9RWS9hdmZxTnA0VHk5Z0kxR2V1NUdOaWVwRHArY1JrRFBMdjBDRTZ2MHNjYVZwK1JNTkF5SzdiUzdzeGZSL205Z0NtekFNUlptdUxQTm1laEtZVTNvOGJWVDJvWmRJeEY2dVRTMDhIclJxUnk5SWt6c3BxYmRrcEZFY0lGcHlLbDF2NlF2UT08L1NpZ25hdHVyZT4KPC9MaWNlbnNlPg==";
 
@@ -289,24 +271,6 @@ namespace PDFManipulations.Controllers
             document.Save(ms);
             return ms;
         }
-       
-        #region Database connection
-
-        private SqlConnection con;
-        private string constr;
-        private void DbConnection()
-        {
-            constr = @"Server=Bhagwat;Database=ExcelData;User Id=sa;Password=sa123;";
-<<<<<<< .mine
-            constr = @"Server=Bhagwat;Database=ExcelData;User Id=sa;Password=sa123;";
-=======
-            constr = @"Server=DESKTOP-JI7C9MS;Database=ExcelData;User Id=sa;Password=sa123;";
->>>>>>> .theirs
-            con = new SqlConnection(constr);
-        }
-        #endregion
-
-
 
         public byte[] AddWatermark(byte[] bytes, BaseFont bf)
         {
@@ -344,20 +308,3 @@ namespace PDFManipulations.Controllers
 }
 
 
-
-
-//string LData = "PExpY2Vuc2U+CjxEYXRhPgo8TGljZW5zZWRUbz5BdmVQb2ludDwvTGljZW5zZWRUbz4KPEVtYWlsVG8+aXRfYmlsbGluZ0BhdmVwb2ludC5jb208L0VtYWlsVG8+CjxMaWNlbnNlVHlwZT5EZXZlbG9wZXIgT0VNPC9MaWNlbnNlVHlwZT4KPExpY2Vuc2VOb3RlPkxpbWl0ZWQgdG8gMSBkZXZlbG9wZXIsIHVubGltaXRlZCBwaHlzaWNhbCBsb2NhdGlvbnM8L0xpY2Vuc2VOb3RlPgo8T3JkZXJJRD4xOTA1MjAwNzE1NDY8L09yZGVySUQ+CjxVc2VySUQ+MTU0ODI2PC9Vc2VySUQ+CjxPRU0+VGhpcyBpcyBhIHJlZGlzdHJpYnV0YWJsZSBsaWNlbnNlPC9PRU0+CjxQcm9kdWN0cz4KPFByb2R1Y3Q+QXNwb3NlLlRvdGFsIGZvciAuTkVUPC9Qcm9kdWN0Pgo8L1Byb2R1Y3RzPgo8RWRpdGlvblR5cGU+RW50ZXJwcmlzZTwvRWRpdGlvblR5cGU+CjxTZXJpYWxOdW1iZXI+Y2JmMzVkNWYtOWE2Ni00ZTI4LTg1ZGQtM2ExN2JiZTM0MTNhPC9TZXJpYWxOdW1iZXI+CjxTdWJzY3JpcHRpb25FeHBpcnk+MjAyMDA2MDQ8L1N1YnNjcmlwdGlvbkV4cGlyeT4KPExpY2Vuc2VWZXJzaW9uPjMuMDwvTGljZW5zZVZlcnNpb24+CjxMaWNlbnNlSW5zdHJ1Y3Rpb25zPmh0dHBzOi8vcHVyY2hhc2UuYXNwb3NlLmNvbS9wb2xpY2llcy91c2UtbGljZW5zZTwvTGljZW5zZUluc3RydWN0aW9ucz4KPC9EYXRhPgo8U2lnbmF0dXJlPnpqZDMrdWgzNTdiZHhqR3JWTTZCN3I2c250TkRBTlRXU2MyQi9RWS9hdmZxTnA0VHk5Z0kxR2V1NUdOaWVwRHArY1JrRFBMdjBDRTZ2MHNjYVZwK1JNTkF5SzdiUzdzeGZSL205Z0NtekFNUlptdUxQTm1laEtZVTNvOGJWVDJvWmRJeEY2dVRTMDhIclJxUnk5SWt6c3BxYmRrcEZFY0lGcHlLbDF2NlF2UT08L1NpZ25hdHVyZT4KPC9MaWNlbnNlPg==";
-
-//Stream stream = new MemoryStream(Convert.FromBase64String(LData));
-
-
-
-
-//stream.Seek
-//(0, SeekOrigin.Begin);
-//new Aspose.Pdf.License().SetLicense(stream);
-
-
-////// file license in app_code folder
-//Aspose.Pdf.License license = new Aspose.Pdf.License();
-//license.SetLicense(Server.MapPath("~/app_code/license.lic"));
