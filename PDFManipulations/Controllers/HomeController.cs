@@ -297,6 +297,11 @@ namespace PDFManipulations.Controllers
         private void DbConnection()
         {
             constr = @"Server=Bhagwat;Database=ExcelData;User Id=sa;Password=sa123;";
+<<<<<<< .mine
+            constr = @"Server=Bhagwat;Database=ExcelData;User Id=sa;Password=sa123;";
+=======
+            constr = @"Server=DESKTOP-JI7C9MS;Database=ExcelData;User Id=sa;Password=sa123;";
+>>>>>>> .theirs
             con = new SqlConnection(constr);
         }
         #endregion
