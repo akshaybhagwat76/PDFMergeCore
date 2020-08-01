@@ -4,6 +4,9 @@
     ViewBag.Title = "Extarct First Page As Image";
 }
 
+<p2 id="result">
+
+</p2>
 @if (ViewBag.ImageExtracted != null)
 {
     <script type="text/javascript">
@@ -12,7 +15,7 @@
     @ViewBag.ImageExtracted
 }
 
-@using (Html.BeginForm("ExtactImagesFromFile", "PageFirstExtract", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("ExtactImagesFromFile", "PageFirstExtract", FormMethod.Post, new { enctype = "multipart/form-data", id = "fileUploadForm" }))
 {
     @Html.AntiForgeryToken()
 
@@ -22,13 +25,13 @@
         <div class="form-group">
             @Html.LabelFor(model => model.files, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextBoxFor(model => model.files, "", new { @type = "file", @multiple = "multiple" })
+                @Html.TextBoxFor(model => model.files, "", new { @type = "file", @multiple = "multiple", @Id = "fileName" })
                 @Html.ValidationMessageFor(model => model.files, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Extract" class="btn btn-primary" />
+                <input id="btnSubmit" type="submit" value="Extract" class="btn btn-primary" />
             </div>
         </div>
         <div class="form-group">
@@ -43,3 +46,57 @@
 
     </div>
 }
+<script src="/lib/jquery/dist/jquery.js"></script>
+<script src="/lib/bootstrap/dist/js/bootstrap.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#btnSubmit").click(function (event) {
+
+            //stop submit the form, we will post it manually.
+            event.preventDefault();
+            $("#result").text('Extract in progress..');
+            // Get form
+            var form = $('#fileUploadForm')[0];
+
+            // Create an FormData object
+            var data = new FormData(form);
+
+            // If you want to add an extra field for the FormData
+            data.append("CustomField", "This is some extra data, testing");
+
+            // disabled the submit button
+            $("#btnSubmit").prop("disabled", true);
+
+            $.ajax({
+                type: "POST",
+                enctype: 'multipart/form-data',
+                url: "/PageFirstExtract/ExtactImagesFromFile",
+                data: data,
+                processData: false,
+                contentType: false,
+                cache: false,
+                timeout: 600000,
+                success: function (data) {
+                    debugger;
+                    $("#result").text(data);
+                    $("#fileName").val("");
+                    console.log("SUCCESS : ", data);
+                    $("#btnSubmit").prop("disabled", false);
+
+                },
+                error: function (e) {
+                    debugger;
+                    $("#result").text(e.responseText);
+                    console.log("ERROR : ", e);
+                    $("#btnSubmit").prop("disabled", false);
+
+                }
+            });
+
+        });
+
+    });
+
+</script>

@@ -6,11 +6,11 @@
 
 
 
-@using (Html.BeginForm("FileUpload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" } ))
+@using (Html.BeginForm("FileUpload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
-     <div class="form-horizontal">
+    <div class="form-horizontal">
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
@@ -44,7 +44,14 @@
 
             </div>
             <div class="col-md-8">
+                @Html.ActionLink("Extracted all Images", "ExtractedImages", "Home")
+            </div>
+            <div class="col-md-8">
                 @Html.ActionLink("Extract First Pafe of PDF as Image", "Index", "PageFirstExtract")
+
+            </div>
+            <div class="col-md-8">
+                @Html.ActionLink("Highlited PDF's", "HighlightedFileDetails", "Home")
 
             </div>
             @*<div class="col-md-8">
@@ -53,5 +60,5 @@
         </div>*@
         </div>
     </div>
-     
+
 }

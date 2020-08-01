@@ -1,0 +1,27 @@
+﻿@model IEnumerable<PDFManipulations.Models.FileDetailsModel>
+<br /><h2>Highlighted pdf</h2><br>
+<table class="table table-bordered">
+    <tr>
+        <th class="col-md-4">
+            @Html.DisplayName("Highlighted pdf text is before pdf extension")
+        </th>
+        <th class="col-md-4">
+            @Html.DisplayName("Path")
+
+        </th>
+    </tr>
+    @if (Model != null)
+    {
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileTextContent)
+                </td>
+            </tr>
+        }
+    }
+</table>

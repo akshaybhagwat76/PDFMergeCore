@@ -17,6 +17,9 @@
         <th class="col-md-4">
             @Html.DisplayNameFor(model => model.FileName)
         </th>
+        <th class="col-md-4">
+            @Html.DisplayName("Path")
+        </th>
     </tr>
     @if (Model != null)
     {
@@ -26,7 +29,9 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.FileName)
                 </td>
-
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileTextContent)
+                </td>
                 @*<td>
                         @Html.ActionLink("View File", "ViewPDF", new { id = item.Id })
                     </td>*@
@@ -38,9 +43,9 @@
 <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
 
 <script>
-    $("#textbox1").keyup(function () {
+    $("#textbox1").keyup(function (event) {
         var textinput = $('#textbox1').val();
-        if (textinput != null && textinput.length > 3) {
+        if (textinput != null && event.keyCode === 13) {
             $.get('../Home/readDataFromFileAndDB?searchText=' + textinput, function (data) {
                 $("#out").empty();
                 if (data != null && data.length > 0) {
@@ -54,11 +59,13 @@
         }
     });
 
+
+
     function highlightPDF($this) {
         var search = $this.attributes[3].value;
         debugger
         var path = $this.getAttribute("data-id");
 
-        window.location.href = "/Home/HighlightPDF?path=" + path + "&desc=" + encodeURIComponent(search);
+        window.location.href = "/Home/HighlightPDF?path=" + encodeURIComponent(path) + "&desc=" + encodeURIComponent(search);
     }
 </script>

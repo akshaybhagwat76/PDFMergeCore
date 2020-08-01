@@ -81,37 +81,17 @@ namespace PDFManipulations.Controllers
                     using (MemoryStream outputData = new MemoryStream())
                     {
 
-                        //ReaderProperties rp = new ReaderProperties();
-
                         iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes, password);
                         var font = BaseFont.CreateFont(BaseFont.TIMES_BOLD, BaseFont.WINANSI, BaseFont.EMBEDDED);
                         byte[] watemarkedbytes = AddWatermark(bytes, font);
 
-                        int PageNum = reader.NumberOfPages;
-                        string[] words;
-                        string line = string.Empty;
-
-                        for (int i = 1; i <= PageNum; i++)
-                        {
-                            string text = PdfTextExtractor.GetTextFromPage(reader, i, new LocationTextExtractionStrategy());
-
-                            words = text.Split('\n');
-                            for (int j = 0, len = words.Length; j < len; j++)
-                            {
-                                line += Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(words[j]));
-                            }
-                        }
 
                         iTextSharp.text.pdf.PdfReader awatemarkreader = new iTextSharp.text.pdf.PdfReader(watemarkedbytes, password);
                         FileDetailsModel Fd = new Models.FileDetailsModel();
-                        Fd.FileContentWithoutPWD = outputData.ToArray();
                         PdfEncryptor.Encrypt(awatemarkreader, outputData, true, "123456", "123456", PdfWriter.ALLOW_MODIFY_CONTENTS);
 
                         bytes = outputData.ToArray();
 
-                        Fd.FileName = files.FileName;
-                        Fd.FileContent = bytes;
-                        Fd.FileTextContent = line;
                         return File(bytes, "application/pdf");
                     }
                 }
@@ -144,6 +124,7 @@ namespace PDFManipulations.Controllers
 
                             FileDetailsModel obj = new FileDetailsModel();
                             obj.FileName = System.IO.Path.GetFileName(file);
+                            obj.FileTextContent = file;
                             DetList.Add(obj);
                         }
                     }
@@ -151,6 +132,64 @@ namespace PDFManipulations.Controllers
             }
 
             return View("FileDetails", DetList);
+        }
+        #endregion
+
+
+        #region View Highlited Uploaded files
+        [HttpGet]
+        public ViewResult HighlightedFileDetails()
+        {
+            var uploads = System.IO.Path.Combine(_environment.WebRootPath);
+            List<FileDetailsModel> DetList = new List<FileDetailsModel>();
+            if (Directory.Exists(uploads))
+            {
+                string supportedExtensions = "*.pdf";
+                foreach (string file in Directory.GetFiles(uploads, supportedExtensions, SearchOption.AllDirectories).Where(s => supportedExtensions.Contains(System.IO.Path.GetExtension(s).ToLower())))
+                {
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        if (file.ToLower().Contains("highlighted"))
+                        {
+
+                            FileDetailsModel obj = new FileDetailsModel();
+                            obj.FileName = System.IO.Path.GetFileName(file);
+                            obj.FileTextContent = file;
+                            DetList.Add(obj);
+                        }
+                    }
+                }
+            }
+
+            return View("HighlightedFileDetails", DetList);
+        }
+        #endregion
+
+        #region View Extracted Images files
+        [HttpGet]
+        public ViewResult ExtractedImages()
+        {
+            var uploads = System.IO.Path.Combine(_environment.WebRootPath);
+            List<FileDetailsModel> DetList = new List<FileDetailsModel>();
+            if (Directory.Exists(uploads))
+            {
+                string supportedExtensions = "*.jpg";
+                foreach (string file in Directory.GetFiles(uploads, supportedExtensions, SearchOption.AllDirectories).Where(s => supportedExtensions.Contains(System.IO.Path.GetExtension(s).ToLower())).OrderByDescending(d=> new FileInfo(d).CreationTime))
+                {
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        if (file.ToLower().Contains("extractedimages"))
+                        {
+                            FileDetailsModel obj = new FileDetailsModel();
+                            obj.FileName = ConvertImageURLToBase64(file);
+                            obj.FileTextContent = file;
+                            DetList.Add(obj);
+                        }
+                    }
+                }
+            }
+
+            return View("ExtractedImages", DetList);
         }
         #endregion
         /// <summary>
@@ -202,18 +241,16 @@ namespace PDFManipulations.Controllers
         {
             if (System.IO.File.Exists(fileName))
             {
-                PdfReader pdfReader = new PdfReader(fileName);
-                for (int page = 1; page <= pdfReader.NumberOfPages; page++)
-                {
-                    ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                InjectAsposeLicemse();
 
-                    string currentPageText = PdfTextExtractor.GetTextFromPage(pdfReader, page, strategy);
-                    if (currentPageText.Contains(searthText))
-                    {
-                        pdfReader.Close();
-                        return true;
-                    }
-                }
+                var document = new Aspose.Pdf.Document(fileName);
+
+                TextAbsorber textAbsorber = new TextAbsorber();
+                document.Pages.Accept(textAbsorber);
+                String extractedText = textAbsorber.Text;
+                textAbsorber.Visit(document);
+                if (extractedText.Contains(searthText, StringComparison.InvariantCultureIgnoreCase))
+                    return true;
             }
             return false;
         }
@@ -227,14 +264,30 @@ namespace PDFManipulations.Controllers
         [HttpGet]
         public IActionResult HighlightPDF(string path, string desc)
         {
+            byte[] result = null;
             if (!string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(desc))
             {
-                var testFile = path;
+                result = SearcText(path, desc).ToArray();
 
-                byte[] result = SearcText(path, desc).ToArray();
-                return File(result, "application/pdf");
+                if (string.IsNullOrWhiteSpace(_environment.WebRootPath))
+                {
+                    _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                }
+
+
+                var uploads = System.IO.Path.Combine(_environment.WebRootPath, "Highlighted");
+
+                if (!System.IO.Directory.Exists(uploads))
+                {
+                    System.IO.Directory.CreateDirectory(uploads);
+                }
+
+
+                var filePath = System.IO.Path.Combine(uploads, desc += ".pdf");
+                System.IO.File.WriteAllBytes(filePath, result);
+
             }
-            return View("FileUpload");
+            return File(result, "application/pdf");
         }
         /// <summary>
         /// Written by Fredio
@@ -244,16 +297,13 @@ namespace PDFManipulations.Controllers
         /// <returns></returns>
         public System.IO.MemoryStream SearcText(string path, string phrase)
         {
-            string LData = "PExpY2Vuc2U+CjxEYXRhPgo8TGljZW5zZWRUbz5BdmVQb2ludDwvTGljZW5zZWRUbz4KPEVtYWlsVG8+aXRfYmlsbGluZ0BhdmVwb2ludC5jb208L0VtYWlsVG8+CjxMaWNlbnNlVHlwZT5EZXZlbG9wZXIgT0VNPC9MaWNlbnNlVHlwZT4KPExpY2Vuc2VOb3RlPkxpbWl0ZWQgdG8gMSBkZXZlbG9wZXIsIHVubGltaXRlZCBwaHlzaWNhbCBsb2NhdGlvbnM8L0xpY2Vuc2VOb3RlPgo8T3JkZXJJRD4xOTA1MjAwNzE1NDY8L09yZGVySUQ+CjxVc2VySUQ+MTU0ODI2PC9Vc2VySUQ+CjxPRU0+VGhpcyBpcyBhIHJlZGlzdHJpYnV0YWJsZSBsaWNlbnNlPC9PRU0+CjxQcm9kdWN0cz4KPFByb2R1Y3Q+QXNwb3NlLlRvdGFsIGZvciAuTkVUPC9Qcm9kdWN0Pgo8L1Byb2R1Y3RzPgo8RWRpdGlvblR5cGU+RW50ZXJwcmlzZTwvRWRpdGlvblR5cGU+CjxTZXJpYWxOdW1iZXI+Y2JmMzVkNWYtOWE2Ni00ZTI4LTg1ZGQtM2ExN2JiZTM0MTNhPC9TZXJpYWxOdW1iZXI+CjxTdWJzY3JpcHRpb25FeHBpcnk+MjAyMDA2MDQ8L1N1YnNjcmlwdGlvbkV4cGlyeT4KPExpY2Vuc2VWZXJzaW9uPjMuMDwvTGljZW5zZVZlcnNpb24+CjxMaWNlbnNlSW5zdHJ1Y3Rpb25zPmh0dHBzOi8vcHVyY2hhc2UuYXNwb3NlLmNvbS9wb2xpY2llcy91c2UtbGljZW5zZTwvTGljZW5zZUluc3RydWN0aW9ucz4KPC9EYXRhPgo8U2lnbmF0dXJlPnpqZDMrdWgzNTdiZHhqR3JWTTZCN3I2c250TkRBTlRXU2MyQi9RWS9hdmZxTnA0VHk5Z0kxR2V1NUdOaWVwRHArY1JrRFBMdjBDRTZ2MHNjYVZwK1JNTkF5SzdiUzdzeGZSL205Z0NtekFNUlptdUxQTm1laEtZVTNvOGJWVDJvWmRJeEY2dVRTMDhIclJxUnk5SWt6c3BxYmRrcEZFY0lGcHlLbDF2NlF2UT08L1NpZ25hdHVyZT4KPC9MaWNlbnNlPg==";
-
-            Stream stream = new MemoryStream(Convert.FromBase64String(LData));
-            stream.Seek(0, SeekOrigin.Begin);
-            new Aspose.Pdf.License().SetLicense(stream);
+            InjectAsposeLicemse();
 
             Aspose.Pdf.Document document = new Aspose.Pdf.Document(path);
-            TextFragmentAbsorber textFragmentAbsorber = new TextFragmentAbsorber(phrase);
-            TextSearchOptions textSearchOptions = new TextSearchOptions(true);
-            textFragmentAbsorber.TextSearchOptions = textSearchOptions;
+            string searchTextValue = string.Format("(?i){0}", phrase);
+            TextFragmentAbsorber textFragmentAbsorber = new TextFragmentAbsorber(searchTextValue, new TextSearchOptions(true));
+            //TextSearchOptions textSearchOptions = new TextSearchOptions(true);
+            //textFragmentAbsorber.TextSearchOptions = textSearchOptions;
             document.Pages.Accept(textFragmentAbsorber);
             TextFragmentCollection textFragmentCollection1 = textFragmentAbsorber.TextFragments;
             if (textFragmentCollection1.Count > 0)
@@ -270,6 +320,15 @@ namespace PDFManipulations.Controllers
             System.IO.MemoryStream ms = new System.IO.MemoryStream();
             document.Save(ms);
             return ms;
+        }
+
+        private static void InjectAsposeLicemse()
+        {
+            string LData = "PExpY2Vuc2U+CjxEYXRhPgo8TGljZW5zZWRUbz5BdmVQb2ludDwvTGljZW5zZWRUbz4KPEVtYWlsVG8+aXRfYmlsbGluZ0BhdmVwb2ludC5jb208L0VtYWlsVG8+CjxMaWNlbnNlVHlwZT5EZXZlbG9wZXIgT0VNPC9MaWNlbnNlVHlwZT4KPExpY2Vuc2VOb3RlPkxpbWl0ZWQgdG8gMSBkZXZlbG9wZXIsIHVubGltaXRlZCBwaHlzaWNhbCBsb2NhdGlvbnM8L0xpY2Vuc2VOb3RlPgo8T3JkZXJJRD4xOTA1MjAwNzE1NDY8L09yZGVySUQ+CjxVc2VySUQ+MTU0ODI2PC9Vc2VySUQ+CjxPRU0+VGhpcyBpcyBhIHJlZGlzdHJpYnV0YWJsZSBsaWNlbnNlPC9PRU0+CjxQcm9kdWN0cz4KPFByb2R1Y3Q+QXNwb3NlLlRvdGFsIGZvciAuTkVUPC9Qcm9kdWN0Pgo8L1Byb2R1Y3RzPgo8RWRpdGlvblR5cGU+RW50ZXJwcmlzZTwvRWRpdGlvblR5cGU+CjxTZXJpYWxOdW1iZXI+Y2JmMzVkNWYtOWE2Ni00ZTI4LTg1ZGQtM2ExN2JiZTM0MTNhPC9TZXJpYWxOdW1iZXI+CjxTdWJzY3JpcHRpb25FeHBpcnk+MjAyMDA2MDQ8L1N1YnNjcmlwdGlvbkV4cGlyeT4KPExpY2Vuc2VWZXJzaW9uPjMuMDwvTGljZW5zZVZlcnNpb24+CjxMaWNlbnNlSW5zdHJ1Y3Rpb25zPmh0dHBzOi8vcHVyY2hhc2UuYXNwb3NlLmNvbS9wb2xpY2llcy91c2UtbGljZW5zZTwvTGljZW5zZUluc3RydWN0aW9ucz4KPC9EYXRhPgo8U2lnbmF0dXJlPnpqZDMrdWgzNTdiZHhqR3JWTTZCN3I2c250TkRBTlRXU2MyQi9RWS9hdmZxTnA0VHk5Z0kxR2V1NUdOaWVwRHArY1JrRFBMdjBDRTZ2MHNjYVZwK1JNTkF5SzdiUzdzeGZSL205Z0NtekFNUlptdUxQTm1laEtZVTNvOGJWVDJvWmRJeEY2dVRTMDhIclJxUnk5SWt6c3BxYmRrcEZFY0lGcHlLbDF2NlF2UT08L1NpZ25hdHVyZT4KPC9MaWNlbnNlPg==";
+
+            Stream stream = new MemoryStream(Convert.FromBase64String(LData));
+            stream.Seek(0, SeekOrigin.Begin);
+            new Aspose.Pdf.License().SetLicense(stream);
         }
 
         public byte[] AddWatermark(byte[] bytes, BaseFont bf)
@@ -304,6 +363,18 @@ namespace PDFManipulations.Controllers
                 return ms.ToArray();
             }
         }
+
+        public String ConvertImageURLToBase64(String url)
+        {
+            StringBuilder _sb = new StringBuilder();
+
+            Byte[] _byte = System.IO.File.ReadAllBytes(url);
+
+            _sb.Append(Convert.ToBase64String(_byte, 0, _byte.Length));
+
+            return _sb.ToString();
+        }
+
     }
 }
 

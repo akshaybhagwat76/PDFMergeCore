@@ -77,6 +77,7 @@ namespace PDFManipulations.Controllers
                 ManagementReportDoc.Close();
                 writer.Dispose();
                 ManagementReportDoc.Dispose();
+                ViewBag.fileDownload = outPutFilePath;
                 return View();
             }
             catch (Exception ex)
