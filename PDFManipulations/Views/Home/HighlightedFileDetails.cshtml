@@ -1,13 +1,23 @@
 ﻿@model IEnumerable<PDFManipulations.Models.FileDetailsModel>
-<br /><h2>Highlighted pdf</h2><br>
+<style type="text/css">
+
+
+    .container {
+        height: 100%;
+        width: 100%;
+        margin: 20px auto;
+    }
+</style>
+<br />
+<h2>Highlighted pdf</h2><br>
+
 <table class="table table-bordered">
     <tr>
         <th class="col-md-4">
-            @Html.DisplayName("Highlighted pdf text is before pdf extension")
+            @Html.DisplayName("Name")
         </th>
         <th class="col-md-4">
-            @Html.DisplayName("Path")
-
+            @Html.DisplayName("File")
         </th>
     </tr>
     @if (Model != null)
@@ -19,9 +29,54 @@
                     @Html.DisplayFor(modelItem => item.FileName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.FileTextContent)
+                    <div id="container_@item.Id"></div>
                 </td>
             </tr>
+
+
         }
     }
 </table>
+
+
+<script type="text/javascript">
+    window.PDFJS_LOCALE = {
+        pdfJsWorker: '~/js/pdf.worker.js'
+    };
+</script>
+
+
+<script src="~/../../js/libs/jquery.min.js"></script>
+<script src="~/../../js/libs/html2canvas.min.js"></script>
+<script src="~/../../js/libs/three.min.js"></script>
+<script src="~/../../js/libs/pdf.min.js"></script>
+<script src="~/js/dist/3dflipbook.js"></script>
+@*<script src="~/../../js/dist/3dflipbook.min.js"></script>*@
+<script src="~/../../js/libs/pdf.worker.js"></script>
+@*<script src="~/../../js/pdf.worker.js"></script>*@
+@foreach (var item in Model)
+{
+    <script type="text/javascript">
+    // Sample 0 {
+
+
+        $("#container_@item.Id").FlipBook({
+        pdf: '@item.FileTextContent',
+        template: {
+            html: '../../templates/default-book-view.html',
+            styles: [
+                '../../css/short-black-book-view.css',
+            ],
+            links: [
+                {
+                rel: 'stylesheet',
+                    href: '../../css/font-awesome.min.css'
+                }
+            ],
+            script: '../../js/default-book-view.js'
+        }
+    });
+    </script>
+
+}
+

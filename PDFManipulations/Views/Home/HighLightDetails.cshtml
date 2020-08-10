@@ -1,0 +1,74 @@
+﻿@model IEnumerable<PDFManipulations.Models.FileDetails>
+<br />
+
+<div class="">
+
+    <ul id="out"></ul>
+</div>
+
+
+<table class="table table-bordered">
+    <tr>
+        <th class="col-md-4">
+            @Html.DisplayNameFor(model => model.FileName)
+        </th>
+    </tr>
+    @if (Model != null)
+    {
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileName)
+
+                </td>
+            </tr>
+            foreach (var par in item.ParaDetails)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => par.Details)
+                        <br />
+                        @Html.DisplayFor(modelItem => par.Text)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td>
+                    <div id="one" class="pdf-pro-plugin" data-mode="normal" data-pdf-url="../Home/ViewListedPDF?path=@item.FilePath" data-color="#336699" data-protection-key="59e02UD918NzITM17d3" data-show-download-button="0"></div>
+                </td>
+            </tr>
+        }
+    }
+</table>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+<script src="~/pdfjs/pdf.js"></script>
+<script src="~/pdfjs/pdf-viewer.js"></script>
+<script>
+    $("#textbox1").keyup(function (event) {
+        var textinput = $('#textbox1').val();
+        if (textinput != null && event.keyCode === 13) {
+            $.get('../Home/readDataFromFileAndDB?searchText=' + textinput, function (data) {
+                $("#out").empty();
+                if (data != null && data.length > 0) {
+                    $.each(data, function (key, item) {
+                        let pdfPath = '/Home/HighlightPDF?path=' + item.searchPath + "&desc=" + item.searchDescription;
+                        debugger
+                        $("<li> <a id='pdfClick' onclick='highlightPDF(this)' style='cursor: pointer;' data-search='" + item.searchDescription + "' data-id='" + item.searchPath + "'>" + item.fileName + "</a></li>").appendTo("ul#out");
+                    })
+                }
+            });
+        }
+    });
+
+
+
+    function highlightPDF($this) {
+        var search = $this.attributes[3].value;
+        debugger
+        var path = $this.getAttribute("data-id");
+
+        window.location.href = "/Home/HighlightPDF?path=" + encodeURIComponent(path) + "&desc=" + encodeURIComponent(search);
+    }
+</script>

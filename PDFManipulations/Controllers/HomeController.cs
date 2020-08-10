@@ -21,6 +21,7 @@ using iTextSharp.text.pdf.parser;
 using System.Security.Cryptography;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using PDFManipulations.Common;
 
 namespace PDFManipulations.Controllers
 {
@@ -133,6 +134,35 @@ namespace PDFManipulations.Controllers
 
             return View("FileDetails", DetList);
         }
+
+
+        [HttpGet]
+        public ViewResult ListFiles()
+        {
+            var uploads = System.IO.Path.Combine(_environment.WebRootPath);
+            List<FileDetailsModel> DetList = new List<FileDetailsModel>();
+            if (Directory.Exists(uploads))
+            {
+                string supportedExtensions = "*.pdf";
+                var files = Directory.GetFiles(uploads, supportedExtensions, SearchOption.AllDirectories).
+                    Where(s => supportedExtensions.Contains(System.IO.Path.GetExtension(s).ToLower()));
+                foreach (string file in files)
+                {
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        if (!file.ToLower().Contains("merged pdfs"))
+                        {
+
+                            FileDetailsModel obj = new FileDetailsModel();
+                            obj.FileName = System.IO.Path.GetFileName(file);
+                            obj.FileTextContent = file;
+                            DetList.Add(obj);
+                        }
+                    }
+                }
+            }
+            return View("ListFiles", DetList);
+        }
         #endregion
 
 
@@ -140,6 +170,7 @@ namespace PDFManipulations.Controllers
         [HttpGet]
         public ViewResult HighlightedFileDetails()
         {
+            int count = 1;
             var uploads = System.IO.Path.Combine(_environment.WebRootPath);
             List<FileDetailsModel> DetList = new List<FileDetailsModel>();
             if (Directory.Exists(uploads))
@@ -153,9 +184,13 @@ namespace PDFManipulations.Controllers
                         {
 
                             FileDetailsModel obj = new FileDetailsModel();
-                            obj.FileName = System.IO.Path.GetFileName(file);
-                            obj.FileTextContent = file;
+                            obj.Id = count;
+                            obj.FileName = System.IO.Path.GetFileNameWithoutExtension(file);
+
+                            //obj.FileTextContent = "../../books/pdf/FoxitPdfSdk.pdf";
+                            obj.FileTextContent = string.Format("../../Highlighted/{0}", System.IO.Path.GetFileName(file));
                             DetList.Add(obj);
+                            count++;
                         }
                     }
                 }
@@ -262,11 +297,13 @@ namespace PDFManipulations.Controllers
         /// <param name="desc"></param>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult HighlightPDF(string path, string desc)
+        public ViewResult HighlightPDF(string path, string desc)
         {
+            List<FileDetails> DetList = new List<FileDetails>();
             byte[] result = null;
             if (!string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(desc))
             {
+                var details = FetchParagraph(path, desc);
                 result = SearcText(path, desc).ToArray();
 
                 if (string.IsNullOrWhiteSpace(_environment.WebRootPath))
@@ -283,11 +320,12 @@ namespace PDFManipulations.Controllers
                 }
 
 
-                var filePath = System.IO.Path.Combine(uploads, desc += ".pdf");
+                var filePath = System.IO.Path.Combine(uploads, string.Format("{0}.pdf", System.IO.Path.GetFileNameWithoutExtension(path)));
                 System.IO.File.WriteAllBytes(filePath, result);
+                DetList.Add(new FileDetails() { FileName = System.IO.Path.GetFileName(path), FilePath = filePath, ParaDetails = details });
 
             }
-            return File(result, "application/pdf");
+            return View("HighLightDetails", DetList);
         }
         /// <summary>
         /// Written by Fredio
@@ -316,10 +354,54 @@ namespace PDFManipulations.Controllers
                     freeText.Color = Aspose.Pdf.Color.Yellow;
                     textFragment.Page.Annotations.Add(freeText);
                 }
+                
             }
             System.IO.MemoryStream ms = new System.IO.MemoryStream();
             document.Save(ms);
             return ms;
+        }
+
+        public List<ParaDetails> FetchParagraph(string path, string phrase)
+        {
+            var paraDetails = new List<ParaDetails>();
+            InjectAsposeLicemse();
+
+            Aspose.Pdf.Document document = new Aspose.Pdf.Document(path);
+            ParagraphAbsorber absorber = new ParagraphAbsorber();
+            absorber.Visit(document);
+            foreach (PageMarkup markup in absorber.PageMarkups)
+            {
+                int i = 1;
+                foreach (MarkupSection section in markup.Sections)
+                {
+                    int j = 1;
+                    foreach (MarkupParagraph paragraph in section.Paragraphs)
+                    {
+                        StringBuilder paragraphText = new StringBuilder();
+
+                        foreach (List<TextFragment> line in paragraph.Lines)
+                        {
+                            foreach (TextFragment fragment in line)
+                            {
+                                paragraphText.Append(fragment.Text);
+                            }
+                            paragraphText.Append("\r\n");
+                        }
+                        paragraphText.Append("\r\n");
+                        var paratext = paragraphText.ToString();
+                        if (paratext.Contains(phrase, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            var paraDetail = new ParaDetails();
+                            paraDetail.Details = string.Format("Page {2}, Section {1}, Paragraph {0} says:", j, i, markup.Number);
+                            paraDetail.Text = paratext;
+                            paraDetails.Add(paraDetail);
+                        }
+                        j++;
+                    }
+                    i++;
+                }
+            }
+            return paraDetails;
         }
 
         private static void InjectAsposeLicemse()
@@ -373,6 +455,22 @@ namespace PDFManipulations.Controllers
             _sb.Append(Convert.ToBase64String(_byte, 0, _byte.Length));
 
             return _sb.ToString();
+        }
+
+        [HttpGet]
+        public IActionResult ViewListedPDF(string path)
+        {
+            InjectAsposeLicemse();
+            byte[] result = null;
+            if (!string.IsNullOrEmpty(path))
+            {
+                InjectAsposeLicemse();
+                Aspose.Pdf.Document document = new Aspose.Pdf.Document(path);
+                System.IO.MemoryStream ms = new System.IO.MemoryStream();
+                document.Save(ms);
+                result = ms.ToArray();
+            }
+            return File(result, "application/pdf");
         }
 
     }

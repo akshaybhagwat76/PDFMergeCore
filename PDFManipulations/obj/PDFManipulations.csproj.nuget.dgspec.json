@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\Saif\\GitProject\\basilkeldhose\\PDFMerge\\PDFMerge\\PDFManipulations\\PDFManipulations.csproj": {}
+    "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj": {}
   },
   "projects": {
-    "F:\\Saif\\GitProject\\basilkeldhose\\PDFMerge\\PDFMerge\\PDFManipulations\\PDFManipulations.csproj": {
+    "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Saif\\GitProject\\basilkeldhose\\PDFMerge\\PDFMerge\\PDFManipulations\\PDFManipulations.csproj",
+        "projectUniqueName": "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
         "projectName": "PDFManipulations",
-        "projectPath": "F:\\Saif\\GitProject\\basilkeldhose\\PDFMerge\\PDFMerge\\PDFManipulations\\PDFManipulations.csproj",
+        "projectPath": "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\PDFManipulations.csproj",
         "packagesPath": "C:\\Users\\balaji\\.nuget\\packages\\",
-        "outputPath": "F:\\Saif\\GitProject\\basilkeldhose\\PDFMerge\\PDFMerge\\PDFManipulations\\obj\\",
+        "outputPath": "F:\\Saif\\GitProject\\PDFMergeCore\\PDFManipulations\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -68,7 +68,7 @@
             },
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
-              "version": "[2.1.9, )"
+              "version": "[2.2.4, )"
             },
             "System.Drawing.Common": {
               "target": "Package",

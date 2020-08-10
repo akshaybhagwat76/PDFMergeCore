@@ -36,6 +36,30 @@
                 @ViewBag.FileStatus
             </div>
         </div>
+        <div class="form-group">
+            @if (ViewBag.ImagePath != null)
+            {
+                <table class="table table-bordered">
+                    <tr>
+                        <th class="col-md-4">Image</th>
+                        <th class="col-md-4"> Path  </th>
+                    </tr>
+                    @foreach (var item in ViewBag.ImagePath as List<FileDetails>)
+                    {
+                        <tr>
+                            <td>
+                                <img src="data:image/png;base64, @item.FilePath" width="20%" height="20%" alt="" />
+                            </td>
+                            <td>
+                                @item.FileName
+                            </td>
+                        </tr>
+
+                    }
+                </table>
+            }
+
+        </div>
         <div>
             @*@Html.ActionLink("Click to download", "DownloadFile", "ImageExtract")*@
             @*@Html.ActionLink("Delete", "DeleteFile", new { id = item.id})*@

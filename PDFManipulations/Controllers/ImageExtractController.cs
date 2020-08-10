@@ -16,6 +16,7 @@ using static System.Net.Mime.MediaTypeNames;
 using iTextSharp.text;
 using System.Text;
 using PDFManipulations.Helpers;
+using PDFManipulations.Common;
 
 namespace PDFManipulations.Controllers
 {
@@ -39,7 +40,7 @@ namespace PDFManipulations.Controllers
             try
             {
                 string rootFolder = Directory.GetCurrentDirectory();
-
+                var imagePath = new List<FileDetails>();
                 Stream fileStream = model.files.OpenReadStream();
 
                  string outPutFilePath = rootFolder + "\\wwwroot\\ExtractedImages\\";
@@ -50,10 +51,16 @@ namespace PDFManipulations.Controllers
 
                 foreach (var name in images.Keys)
                 {
-                    images[name].Save(System.IO.Path.Combine(directory, name));
+                    var obj = new FileDetails();
+                    var imgPath = System.IO.Path.Combine(directory, name);                        
+                    images[name].Save(imgPath);
+                    obj.FilePath= Utility.ConvertImageURLToBase64(imgPath);
+                    obj.FileName =Path.GetFileName(imgPath);
+                    imagePath.Add(obj);
                 }
 
                 ViewBag.ImageExtracted = "Image Extracted Succesfully in this path :- " + outPutFilePath;
+                ViewBag.ImagePath = imagePath;
             }
             catch (Exception)
             {
