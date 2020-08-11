@@ -55,7 +55,7 @@ namespace PDFManipulations.Controllers
                     var imgPath = System.IO.Path.Combine(directory, name);                        
                     images[name].Save(imgPath);
                     obj.FilePath= Utility.ConvertImageURLToBase64(imgPath);
-                    obj.FileName =Path.GetFileName(imgPath);
+                    obj.FileName = imgPath;
                     imagePath.Add(obj);
                 }
 

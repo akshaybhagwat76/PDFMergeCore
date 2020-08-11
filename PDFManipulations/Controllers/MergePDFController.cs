@@ -40,6 +40,12 @@ namespace PDFManipulations.Controllers
         [Route("MergePDFController/MergeFiless")]
         public ActionResult MergeFiless(IFormFile[] files)
         {
+            ViewBag.Message = string.Empty;
+            if (files.Length==0)
+            {
+                ViewBag.Message = "Select some file before you click merge.";
+                return View("MergeFiles");
+            }
             byte[] password = Encoding.ASCII.GetBytes("123456");
 
             try

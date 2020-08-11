@@ -24,8 +24,12 @@ F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\V
 F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\FileDetails.cshtml.g.cs
 F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\FileDetails_.cshtml.g.cs
 F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\FileUpload.cshtml.g.cs
+F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\HighLightDetails.cshtml.g.cs
+F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\HighlightedFileDetails - Copy (2).cshtml.g.cs
+F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\HighlightedFileDetails - Copy.cshtml.g.cs
 F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\HighlightedFileDetails.cshtml.g.cs
 F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\Index.cshtml.g.cs
+F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\ListFiles.cshtml.g.cs
 F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\Privacy.cshtml.g.cs
 F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\Home\ViewPDF.cshtml.g.cs
 F:\Saif\GitProject\PDFMergeCore\PDFManipulations\obj\Debug\netcoreapp2.2\Razor\Views\ImageExtract\ExtactImagesFromFile.cshtml.g.cs
